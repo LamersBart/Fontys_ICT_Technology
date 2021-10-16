@@ -18,12 +18,15 @@ int arrayRood[15];
 int arrayGroen[15];
 int arrayBlauw[15];
 int teller = 0;
+
 int tellerRood = 0;
 int tellerGroen = 0;
 int tellerBlauw = 0;
+
 int redFrequency = 0;
 int greenFrequency = 0;
 int blueFrequency = 0;
+
 int minRood = 0;
 int maxRood = 0;
 int minGroen = 0;
@@ -49,7 +52,7 @@ void CalibreerRood()
 
 void CalibreerGroen()
 {
-  //RED filter
+  //GREEN filter
   digitalWrite(S2, HIGH);
   digitalWrite(S3, HIGH);
 
@@ -64,7 +67,7 @@ void CalibreerGroen()
 
 void CalibreerBlauw()
 {
-  //RED filter
+  //BLUE filter
   digitalWrite(S2, LOW);
   digitalWrite(S3, HIGH);
 
@@ -77,6 +80,16 @@ void CalibreerBlauw()
   tellerBlauw++;
 }
 
+void Instructies()
+{
+  Serial.println(" ");
+  Serial.println("Commando's:");
+  Serial.println("Typ: 'Calibreer R of G of B' voor kleur calibratie.");
+  Serial.println("Typ: 'Scan' om te scannen.");
+  Serial.println("Typ: 'Voer uit' om scans uit te voeren.");
+  Serial.println("Typ: 'Instructies' voor beschikbare commando's.");
+  Serial.println("");
+}
 
 void setup() 
 {
@@ -97,12 +110,13 @@ void setup()
   digitalWrite(S0, HIGH);
   digitalWrite(S1, LOW);
 
-  // Test
-  Serial.print("Setup Complete! \n");
+  Serial.println("Setup complete!");
+  Instructies();
 }
 
 void loop() 
 {
+
   if (Serial.available() > 0)
   {
     char received = Serial.read();
@@ -111,7 +125,6 @@ void loop()
       Serial.println("Arduino Received: " + message); // Only for debugging.
       if (message == "Scan")
       {
-        // put your main code here, to run repeatedly:
         //RED filter
         digitalWrite(S2, LOW);
         digitalWrite(S3, LOW);
@@ -153,7 +166,6 @@ void loop()
         }
       } else if (message == "Voer uit")
       {
-        Serial.println("Gestopt met scannen!");
         for (int i = 0; i < teller; i++)
         {
           if (array[i] == "Rood")
@@ -183,7 +195,7 @@ void loop()
           array[i] = "";
         }
         teller = 0;
-      } else if (message == "Calibreer Rood")
+      } else if (message == "Calibreer R")
       {
         for (int i = 0; i < 15; i++)
         {
@@ -205,9 +217,13 @@ void loop()
         minRood = minRood - range;
         maxRood = maxRood + range;
         message = "";
-        Serial.println(minRood);
+        Serial.println("");
+        Serial.print("Min: ");
         Serial.println(maxRood);
-      } else if (message == "Calibreer Groen")
+        Serial.print("Min: ");
+        Serial.println(maxRood);
+        Serial.println("");
+      } else if (message == "Calibreer G")
       {
         for (int i = 0; i < 15; i++)
         {
@@ -229,9 +245,13 @@ void loop()
         minGroen = minGroen - range;
         maxGroen = maxGroen + range;
         message = "";
+        Serial.println("");
+        Serial.print("Min: ");
         Serial.println(minGroen);
+        Serial.print("Max: ");
         Serial.println(maxGroen);
-      } else if (message == "Calibreer Blauw")
+        Serial.println("");
+      } else if (message == "Calibreer B")
       {
         for (int i = 0; i < 15; i++)
         {
@@ -253,8 +273,15 @@ void loop()
         minBlauw = minBlauw - range;
         maxBlauw = maxBlauw + range;
         message = "";
+        Serial.println("");
+        Serial.print("Min: ");
         Serial.println(minBlauw);
+        Serial.print("Max: ");
         Serial.println(maxBlauw);
+        Serial.println("");
+      } else if (message == "Instructies")
+      {
+        Instructies();
       }
       message = "";
     }
