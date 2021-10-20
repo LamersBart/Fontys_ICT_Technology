@@ -281,26 +281,31 @@ void loop()
     if (received == '\n') // Message is finished, so process message.
     {
       Serial.println("Arduino Received: " + message); // Only for debugging.
-      if (message == "Scan")
+      switch (message)
       {
+      case "Scan":
         Scannen();
-      } else if (message == "Voer uit")
-      {
+        break;
+      case  "Uitvoeren":
         Uitvoeren();
-      } else if (message == "Calibreer R")
-      {
+        break;
+      case  "Calibreer R":
         CalibreerValuesRood();
-      } else if (message == "Calibreer G")
-      {
+        break;
+      case  "Calibreer G":
         CalibreerValuesGroen();
-      } else if (message == "Calibreer B")
-      {
+        break;
+      case  "Calibreer B":
         CalibreerValuesBlauw();
-      } else if (message == "Instructies")
-      {
+        break;
+      case  "Instructies":
         Instructies();
+        break;
+      default:
+        Serial.println("Foutieve invoer!");
+        message = "";
+        break;
       }
-      message = "";
     }
     else  // Message is not finished yet, so add the received character to message.
     {
