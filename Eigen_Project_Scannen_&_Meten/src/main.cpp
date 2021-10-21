@@ -5,7 +5,6 @@
 const int PIN_RGB_BLUE = 3;
 const int PIN_RGB_GREEN = 5;
 const int PIN_RGB_RED = 6;
-
 const int OUTPUT_SENSOR = 8;
 const int S0 = 12;
 const int S1 = 10;
@@ -35,7 +34,7 @@ int minBlauw = 0;
 int maxBlauw = 0;
 const int range = 2;
 
-void CalibreerRood()
+void KalibreerRood()
 {
   //RED filter
   digitalWrite(S2, LOW);
@@ -50,11 +49,11 @@ void CalibreerRood()
   tellerRood++;
 }
 
-void CalibreerValuesRood()
+void KalibreerValuesRood()
 {
   for (int i = 0; i < 15; i++)
   {
-    CalibreerRood();
+    KalibreerRood();
     minRood = arrayRood[0];
     maxRood = arrayRood[0];
   }
@@ -71,7 +70,6 @@ void CalibreerValuesRood()
   }
   minRood = minRood - range;
   maxRood = maxRood + range;
-  message = "";
   Serial.println("");
   Serial.print("Min: ");
   Serial.println(minRood);
@@ -80,7 +78,7 @@ void CalibreerValuesRood()
   Serial.println("");
 }
 
-void CalibreerGroen()
+void KalibreerGroen()
 {
   //GREEN filter
   digitalWrite(S2, HIGH);
@@ -95,11 +93,11 @@ void CalibreerGroen()
   tellerGroen++;
 }
 
-void CalibreerValuesGroen()
+void KalibreerValuesGroen()
 {
   for (int i = 0; i < 15; i++)
   {
-    CalibreerGroen();
+    KalibreerGroen();
     minGroen = arrayGroen[0];
     maxGroen = arrayGroen[0];
   }
@@ -116,7 +114,6 @@ void CalibreerValuesGroen()
   }
   minGroen = minGroen - range;
   maxGroen = maxGroen + range;
-  message = "";
   Serial.println("");
   Serial.print("Min: ");
   Serial.println(minGroen);
@@ -125,7 +122,7 @@ void CalibreerValuesGroen()
   Serial.println("");
 }
 
-void CalibreerBlauw()
+void KalibreerBlauw()
 {
   //BLUE filter
   digitalWrite(S2, LOW);
@@ -140,11 +137,11 @@ void CalibreerBlauw()
   tellerBlauw++;
 }
 
-void CalibreerValuesBlauw()
+void KalibreerValuesBlauw()
 {
   for (int i = 0; i < 15; i++)
   {
-    CalibreerBlauw();
+    KalibreerBlauw();
     minBlauw = arrayBlauw[0];
     maxBlauw = arrayBlauw[0];
   }
@@ -161,7 +158,6 @@ void CalibreerValuesBlauw()
   }
   minBlauw = minBlauw - range;
   maxBlauw = maxBlauw + range;
-  message = "";
   Serial.println("");
   Serial.print("Min: ");
   Serial.println(minBlauw);
@@ -176,6 +172,7 @@ void Uitvoeren()
   {
     if (array[i] == "Rood")
     {
+      Serial.println("Rood");
       digitalWrite(PIN_RGB_RED, HIGH);
       delay(500);
       digitalWrite(PIN_RGB_RED, LOW);
@@ -183,6 +180,7 @@ void Uitvoeren()
     }
     if (array[i] == "Groen")
     {
+      Serial.println("Groen");
       digitalWrite(PIN_RGB_GREEN, HIGH);
       delay(500);
       digitalWrite(PIN_RGB_GREEN, LOW);
@@ -190,17 +188,20 @@ void Uitvoeren()
     }
     if (array[i] == "Blauw")
     {
+      Serial.println("Blauw");
       digitalWrite(PIN_RGB_BLUE, HIGH);
       delay(500);
       digitalWrite(PIN_RGB_BLUE, LOW);
       delay(500);
     }
   }
+  Serial.println("");
+  Serial.println("Uitvoeren voltooid!");
+  Serial.println("");
   for (int i = 0; i < 20; i++)
   {
     array[i] = "";
   }
-  teller = 0;
 }
 
 void Scannen()
@@ -224,32 +225,45 @@ void Scannen()
   {
     array[teller] = "Rood";
     Serial.println("Dit is rood");
-    Serial.println(" ");
+    Serial.println("");
     teller++;
   }
   else if (greenFrequency > minGroen && greenFrequency < maxGroen)
   {
     array[teller] = "Groen";
     Serial.println("Dit is Groen");
-    Serial.println(" ");
+    Serial.println("");
     teller++;
   }
   else if (blueFrequency > minBlauw && blueFrequency < maxBlauw)
   {
     array[teller] = "Blauw";
     Serial.println("Dit is Blauw");
-    Serial.println(" ");
+    Serial.println("");
     teller++;
   }
 }
 
+void Printen(int AantalScans)
+{
+  for (int i = 0; i < AantalScans; i++)
+  
+    Serial.print("Scan ");
+    Serial.print(i + 1);
+    Serial.print(" = ");
+    Serial.println(array[i]);
+  }
+  Serial.println("");
+}
+
 void Instructies()
 {
-  Serial.println(" ");
+  Serial.println("");
   Serial.println("Commando's:");
-  Serial.println("Typ: 'Calibreer R of G of B' voor kleur calibratie.");
+  Serial.println("Typ: 'Kalibreer R of G of B' voor kleur calibratie.");
   Serial.println("Typ: 'Scan' om te scannen.");
-  Serial.println("Typ: 'Voer uit' om scans uit te voeren.");
+  Serial.println("Typ: 'Print' om scans uit te printen.");
+  Serial.println("Typ: 'Uitvoeren' om scans uit te voeren.");
   Serial.println("Typ: 'Instructies' voor beschikbare commando's.");
   Serial.println("");
 }
@@ -281,31 +295,32 @@ void loop()
     if (received == '\n') // Message is finished, so process message.
     {
       Serial.println("Arduino Received: " + message); // Only for debugging.
-      switch (message)
+      if (message == "Scan")
       {
-      case "Scan":
         Scannen();
-        break;
-      case  "Uitvoeren":
+      } else if (message == "Print")
+      {
+        Printen(teller);
+      } else if (message == "Uitvoeren")
+      {
         Uitvoeren();
-        break;
-      case  "Calibreer R":
-        CalibreerValuesRood();
-        break;
-      case  "Calibreer G":
-        CalibreerValuesGroen();
-        break;
-      case  "Calibreer B":
-        CalibreerValuesBlauw();
-        break;
-      case  "Instructies":
+        teller = 0;
+      } else if (message == "Kalibreer R")
+      {
+        KalibreerValuesRood();
+      } else if (message == "Kalibreer G")
+      {
+        KalibreerValuesGroen();
+      } else if (message == "Kalibreer B")
+      {
+        KalibreerValuesBlauw();
+      } else if (message == "Instructies")
+      {
         Instructies();
-        break;
-      default:
+      } else {
         Serial.println("Foutieve invoer!");
-        message = "";
-        break;
       }
+      message = "";      
     }
     else  // Message is not finished yet, so add the received character to message.
     {
