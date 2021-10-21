@@ -247,7 +247,7 @@ void Scannen()
 void Printen(int AantalScans)
 {
   for (int i = 0; i < AantalScans; i++)
-  
+  {
     Serial.print("Scan ");
     Serial.print(i + 1);
     Serial.print(" = ");
